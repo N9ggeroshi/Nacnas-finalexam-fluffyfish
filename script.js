@@ -1,4 +1,4 @@
-let move_speed = 3, grativy = 0.5;
+let move_speed = 2, grativy = 0.10;
 let isda_dy = 0;
 let isda = document.querySelector('.isda');
 let img = document.getElementById('isda-1');
@@ -56,7 +56,7 @@ muteButtonGameOver.addEventListener('click', () => toggleMute(muteButtonGameOver
 
 function handleJump() {
     if (game_state === 'Play') {
-        isda_dy = -7.6;
+        isda_dy = -4.5;
     }
 }
 
@@ -114,16 +114,31 @@ function play() {
 
     function apply_gravity() {
         if (game_state != 'Play') return;
+    
+        isda_props = isda.getBoundingClientRect(); // Update before using
+    
         isda_dy += grativy;
-
-        if (isda_props.top <= 0 || isda_props.bottom >= background.bottom) {
+        if (isda_dy > 8) isda_dy = 8;
+    
+        let newTop = isda_props.top + isda_dy;
+    
+        // Prevent jumping off the top
+        if (newTop < 0) {
+            newTop = 0;
+            isda_dy = 0;
+        }
+    
+        // Prevent falling below ground
+        if (isda_props.bottom >= background.bottom) {
             endGame();
             return;
         }
-        isda.style.top = isda_props.top + isda_dy + 'px';
-        isda_props = isda.getBoundingClientRect();
+    
+        isda.style.top = newTop + 'px';
+    
         requestAnimationFrame(apply_gravity);
     }
+    
     requestAnimationFrame(apply_gravity);
 
     let pipe_seperation = 0;
